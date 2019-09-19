@@ -43,30 +43,18 @@ public class Quickstart {
 
 
 
-        // The easiest way to create a Shiro SecurityManager with configured
-        // realms, users, roles and permissions is to use the simple INI config.
-        // We'll do that by using a factory that can ingest a .ini file and
-        // return a SecurityManager instance:
-
-        // Use the shiro.ini file at the root of the classpath
-        // (file: and url: prefixes load from files and urls respectively):
+       //使用工厂模式传入不同配置文件，得到不同的SecurityManager工厂
         Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
+        //获得SecurityManager实例
         SecurityManager securityManager = factory.getInstance();
 
-        // for this simple example quickstart, make the SecurityManager
-        // accessible as a JVM singleton.  Most applications wouldn't do this
-        // and instead rely on their container configuration or web.xml for
-        // webapps.  That is outside the scope of this simple quickstart, so
-        // we'll just do the bare minimum so you can continue to get a feel
-        // for things.
+        //使用 SecurityManager
         SecurityUtils.setSecurityManager(securityManager);
 
-        // Now that a simple Shiro environment is set up, let's see what you can do:
-
-        // get the currently executing user:
+        //获得 Subject 对象
         Subject currentUser = SecurityUtils.getSubject();
 
-        // Do some stuff with a Session (no need for a web or EJB container!!!)
+        //获得session
         Session session = currentUser.getSession();
         session.setAttribute("someKey", "aValue");
         String value = (String) session.getAttribute("someKey");
@@ -76,9 +64,12 @@ public class Quickstart {
 
         // let's login the current user so we can check against roles and permissions:
         if (!currentUser.isAuthenticated()) {
+
+            //根据用户输入的用户名和密码 生成token
             UsernamePasswordToken token = new UsernamePasswordToken("lonestarr", "vespa");
             token.setRememberMe(true);
             try {
+                //登录验证
                 currentUser.login(token);
             } catch (UnknownAccountException uae) {
                 log.info("There is no user with username of " + token.getPrincipal());
