@@ -38,44 +38,50 @@ public class Quickstart {
     private static final transient Logger log = LoggerFactory.getLogger(Quickstart.class);
 
 
-    public static void main(String[] args) {
+    public static void  main(String[] args) {
 
-
-
-
-       //使用工厂模式传入不同配置文件，得到不同的SecurityManager工厂
+        //使用抽象工厂模式，获取SecurityManager工厂，根据shiro.ini文件
         Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
-        //获得SecurityManager实例
+        //初始化SecurityManager，并获得SecurityManager实例
         SecurityManager securityManager = factory.getInstance();
-
-        //使用 SecurityManager
+        //将SecurityManager实例，绑定给SecurityUtils
         SecurityUtils.setSecurityManager(securityManager);
 
-        //获得 Subject 对象
+        //获得 Subject 对象,shiro的所有操作(验证 授权)API，都是通过Subject调用完成的
+        //当前这个用户 一般情况指的是数据库里面一条用户数据
         Subject currentUser = SecurityUtils.getSubject();
 
-        //获得session
+        //获得shiro的session，shiro的session可以通过可以使用httprequest 获取及管理
         Session session = currentUser.getSession();
+        // 测试为session添加 key value
         session.setAttribute("someKey", "aValue");
+        // 测试获取session中的内容
         String value = (String) session.getAttribute("someKey");
         if (value.equals("aValue")) {
             log.info("Retrieved the correct value! [" + value + "]");
         }
 
-        // let's login the current user so we can check against roles and permissions:
+
+        // Subject.isAuthenticated 判断当前用户是否已经登录；true 已经登录，false 没有登录；
+        // 根据用户不同登录状态，执行不同的逻辑
         if (!currentUser.isAuthenticated()) {
 
-            //根据用户输入的用户名和密码 生成token
+            //根据用户输入的用户名和密码 生成token,token 也可使用其它信息生产 例如邮件 手机号
             UsernamePasswordToken token = new UsernamePasswordToken("lonestarr", "vespa");
+            // 记住我
             token.setRememberMe(true);
             try {
-                //登录验证
+                //当前用户验证
+                //如果登录失败 将会返回不同类型的异常
                 currentUser.login(token);
-            } catch (UnknownAccountException uae) {
+            } //用户名错误
+            catch (UnknownAccountException uae) {
                 log.info("There is no user with username of " + token.getPrincipal());
-            } catch (IncorrectCredentialsException ice) {
+            }// 密码错误
+            catch (IncorrectCredentialsException ice) {
                 log.info("Password for account " + token.getPrincipal() + " was incorrect!");
-            } catch (LockedAccountException lae) {
+            }//用户被锁
+            catch (LockedAccountException lae) {
                 log.info("The account for username " + token.getPrincipal() + " is locked.  " +
                         "Please contact your administrator to unlock it.");
             }
