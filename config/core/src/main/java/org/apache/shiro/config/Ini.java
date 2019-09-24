@@ -225,10 +225,18 @@ public class Ini implements Map<String, Ini.Section> {
      * @return a new {@code Ini} instance loaded with the INI-formatted data in the resource at the given path.
      * @throws ConfigurationException if the path cannot be loaded into an {@code Ini} instance.
      */
+    /**
+     * 根据指定的 xxx.ini文件 位置，创建Ini类
+     * @param resourcePath
+     * @return
+     * @throws ConfigurationException
+     */
     public static Ini fromResourcePath(String resourcePath) throws ConfigurationException {
+        // 判断 字符串 是否为 null 或 ""
         if (!StringUtils.hasLength(resourcePath)) {
-            throw new IllegalArgumentException("Resource Path argument cannot be null or empty.");
+            throw new IllegalArgumentException("资源路径参数不能为空.");
         }
+        //初始化 Ini
         Ini ini = new Ini();
         ini.loadFromPath(resourcePath);
         return ini;
@@ -247,6 +255,7 @@ public class Ini implements Map<String, Ini.Section> {
         try {
             is = ResourceUtils.getInputStreamForPath(resourcePath);
         } catch (IOException e) {
+            //配置异常
             throw new ConfigurationException(e);
         }
         load(is);

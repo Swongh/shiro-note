@@ -33,6 +33,7 @@ import java.net.URL;
  * @see #getInputStreamForPath(String)
  * @since 0.2
  */
+// 加载静态资源的工具类
 public class ResourceUtils {
 
     /**
@@ -119,10 +120,18 @@ public class ResourceUtils {
      * @return the InputStream for the specified resource.
      * @throws IOException if there is a problem acquiring the resource at the specified path.
      */
+    /**
+     * 根据指定的地址获得 文件的输入流
+     * @param resourcePath  ini 的文件地址
+     * @return  InputStream 输入流
+     * @throws IOException IO异常，一般情况文件不存在  会报出这个错误
+     */
     public static InputStream getInputStreamForPath(String resourcePath) throws IOException {
 
         InputStream is;
+        //判断文件前缀 文件的类型  classpath  url   file
         if (resourcePath.startsWith(CLASSPATH_PREFIX)) {
+            // stripPrefix  截取：后的字符串
             is = loadFromClassPath(stripPrefix(resourcePath));
 
         } else if (resourcePath.startsWith(URL_PREFIX)) {
@@ -144,7 +153,7 @@ public class ResourceUtils {
 
     private static InputStream loadFromFile(String path) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug("Opening file [" + path + "]...");
+            log.debug("打开文件 [" + path + "]...");
         }
         return new FileInputStream(path);
     }
@@ -156,10 +165,16 @@ public class ResourceUtils {
     }
 
     private static InputStream loadFromClassPath(String path) {
-        log.debug("Opening resource from class path [{}]", path);
+        log.debug("打开类路径文件资源 [{}]", path);
+        // 获得输入流
         return ClassUtils.getResourceAsStream(path);
     }
 
+    /**
+     * 截取部分 “：”到结束的字符串
+     * @param resourcePath  带有前缀的字符串
+     * @return String  截取后的字符串
+     */
     private static String stripPrefix(String resourcePath) {
         return resourcePath.substring(resourcePath.indexOf(":") + 1);
     }

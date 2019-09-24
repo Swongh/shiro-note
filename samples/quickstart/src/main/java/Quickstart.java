@@ -95,7 +95,7 @@ public class Quickstart {
         //print their identifying principal (in this case, a username):
         log.info("User [" + currentUser.getPrincipal() + "] logged in successfully.");
 
-        //test a role:
+        //判断角色
         if (currentUser.hasRole("schwartz")) {
             log.info("May the Schwartz be with you!");
         } else {

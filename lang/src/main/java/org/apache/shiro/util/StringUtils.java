@@ -94,6 +94,7 @@ public class StringUtils {
      * @return <code>true</code> if the String is not null and has length
      * @see #hasText(String)
      */
+     // 判断 字符串 是否为 null  ""
     public static boolean hasLength(String str) {
         return (str != null && str.length() > 0);
     }

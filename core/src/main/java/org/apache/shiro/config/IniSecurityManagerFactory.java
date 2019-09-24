@@ -68,7 +68,7 @@ public class IniSecurityManagerFactory extends IniFactorySupport<SecurityManager
         this();
         setIni(config);
     }
-
+    // 构造方法  根据ini文件初始化  SecurityManagerFactory
     public IniSecurityManagerFactory(String iniResourcePath) {
         this(Ini.fromResourcePath(iniResourcePath));
     }

@@ -35,6 +35,10 @@ import java.util.List;
  *
  * @since 0.1
  */
+
+/**
+ *  这个类用于 操作本地
+ */
 public class ClassUtils {
 
     //TODO - complete JavaDoc
@@ -92,23 +96,20 @@ public class ClassUtils {
 
         if (is == null) {
             if (log.isTraceEnabled()) {
-                log.trace("Resource [" + name + "] was not found via the thread context ClassLoader.  Trying the " +
-                        "current ClassLoader...");
+                log.trace("当前线程加载资源【"+name+"】失败,正在尝试使用类加载器");
             }
             is = CLASS_CL_ACCESSOR.getResourceStream(name);
         }
 
         if (is == null) {
             if (log.isTraceEnabled()) {
-                log.trace("Resource [" + name + "] was not found via the current class loader.  Trying the " +
-                        "system/application ClassLoader...");
+                log.trace("当前类加载器加载资源【"+name+"】失败,正在尝试使用系统/应用程序类加载器");
             }
             is = SYSTEM_CL_ACCESSOR.getResourceStream(name);
         }
 
         if (is == null && log.isTraceEnabled()) {
-            log.trace("Resource [" + name + "] was not found via the thread context, current, or " +
-                    "system/application ClassLoaders.  All heuristics have been exhausted.  Returning null.");
+            log.trace("所有的加载器都已经尝试,但是【"+name+"】加载失败返回值为空");
         }
 
         return is;
@@ -238,7 +239,9 @@ public class ClassUtils {
      * @since 1.0
      */
     private static interface ClassLoaderAccessor {
+        // 使用反射获得类对象
         Class loadClass(String fqcn);
+        // 根据指定路径  获得输入流
         InputStream getResourceStream(String name);
     }
 
@@ -252,20 +255,24 @@ public class ClassUtils {
             ClassLoader cl = getClassLoader();
             if (cl != null) {
                 try {
+                    //加载fqcn 到内存
                     clazz = cl.loadClass(fqcn);
                 } catch (ClassNotFoundException e) {
                     if (log.isTraceEnabled()) {
-                        log.trace("Unable to load clazz named [" + fqcn + "] from class loader [" + cl + "]");
+                        log.trace(" 使用 [" + cl + "]  加载 [ "+ fqcn +" ] 失败");
                     }
                 }
             }
             return clazz;
         }
 
+        //获得 输入流，根据用户指定文件地址
         public InputStream getResourceStream(String name) {
             InputStream is = null;
+            //类加载
             ClassLoader cl = getClassLoader();
             if (cl != null) {
+                //通过类加载器在classPath目录下获取资源.并且是以流的形式
                 is = cl.getResourceAsStream(name);
             }
             return is;
@@ -276,7 +283,7 @@ public class ClassUtils {
                 return doGetClassLoader();
             } catch (Throwable t) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to acquire ClassLoader.", t);
+                    log.debug("无法获取类加载器", t);
                 }
             }
             return null;
